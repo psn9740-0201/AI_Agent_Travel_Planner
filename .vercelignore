@@ -1,0 +1,9 @@
+# Vercel 업로드 제외 (CLI 배포 시)
+.env
+.env.*
+!.env.example
+data/
+node_modules/
+.githooks/
+*.log
+.DS_Store

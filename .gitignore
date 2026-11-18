@@ -1,0 +1,28 @@
+# 비밀 정보 — 절대 커밋하지 않음
+.env
+.env.*
+!.env.example
+
+# 의존성
+node_modules/
+
+# 로그 / OS / 에디터
+npm-debug.log*
+*.log
+.DS_Store
+.vscode/
+.idea/
+
+# 사용량 기록 (서버가 생성)
+data/
+
+# Vercel CLI 로컬 설정
+.vercel/
+
+# 기타 비밀 파일 형식
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets.*

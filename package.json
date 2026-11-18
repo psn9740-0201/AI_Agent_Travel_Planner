@@ -1,0 +1,25 @@
+{
+  "name": "ai-agent-travel-planner",
+  "version": "0.1.0",
+  "description": "국내 여행 계획 AI Agent 웹앱 (OpenAI Responses API + NAVER 검색/지도)",
+  "type": "module",
+  "main": "server/index.js",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "check:env": "node server/config/env.js --check",
+    "test:search": "node scripts/test-search-places.js",
+    "check:secrets": "node scripts/check-secrets.js",
+    "sync:vercel": "node scripts/sync-vercel.js",
+    "check:deploy": "node scripts/check-deploy.js"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.10",
+    "express": "^5.3.0",
+    "openai": "^7.59.0"
+  }
+}

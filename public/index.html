@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>여행가자 · AI 국내 여행 플래너</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%B3%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">🧳</span>
+      <span class="brand-name">여행가자</span>
+    </div>
+    <span class="mode-badge" id="mode-badge">연결 확인 중…</span>
+  </header>
+
+  <section class="hero">
+    <h1>어디로 떠나볼까요?</h1>
+    <p>조건만 알려 주세요. AI 에이전트가 장소를 찾고, 동선을 짜고, 예산까지 맞춰 드려요.</p>
+  </section>
+
+  <main class="container">
+    <!-- ───────────── 입력 폼 ───────────── -->
+    <form id="trip-form" class="card form-card" novalidate>
+      <div class="form-grid">
+        <!-- 1. 지역 -->
+        <div class="field span-2">
+          <label class="label" for="region"><span class="step">1</span>여행 지역</label>
+          <input id="region" name="region" list="region-list" placeholder="예: 강릉, 부산, 경주" value="강릉" required autocomplete="off" />
+          <datalist id="region-list">
+            <option value="강릉"></option><option value="부산"></option><option value="경주"></option>
+            <option value="제주"></option><option value="여수"></option><option value="전주"></option>
+            <option value="속초"></option><option value="통영"></option>
+          </datalist>
+          <div class="quick" data-target="region">
+            <button type="button" class="pill" data-value="강릉">🌊 강릉</button>
+            <button type="button" class="pill" data-value="부산">🎡 부산</button>
+            <button type="button" class="pill" data-value="경주">🏯 경주</button>
+          </div>
+        </div>
+
+        <!-- 2. 날짜 / 기간 -->
+        <div class="field">
+          <label class="label" for="startDate"><span class="step">2</span>출발일</label>
+          <input id="startDate" name="startDate" type="date" required />
+        </div>
+        <div class="field">
+          <label class="label" for="days">여행 기간</label>
+          <select id="days" name="days">
+            <option value="1">당일치기</option>
+            <option value="2">1박 2일</option>
+            <option value="3" selected>2박 3일</option>
+            <option value="4">3박 4일</option>
+            <option value="5">4박 5일</option>
+          </select>
+        </div>
+
+        <!-- 3. 인원 / 예산 -->
+        <div class="field">
+          <label class="label" for="people"><span class="step">3</span>여행 인원</label>
+          <div class="stepper">
+            <button type="button" class="stepper-btn" data-delta="-1" aria-label="인원 줄이기">−</button>
+            <input id="people" name="people" type="number" min="1" max="20" value="2" />
+            <span class="stepper-unit">명</span>
+            <button type="button" class="stepper-btn" data-delta="1" aria-label="인원 늘리기">+</button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="budget">총예산</label>
+          <div class="money">
+            <input id="budget" name="budget" inputmode="numeric" value="800,000" />
+            <span>원</span>
+          </div>
+          <div class="quick" data-target="budget">
+            <button type="button" class="pill" data-value="300000">30만</button>
+            <button type="button" class="pill" data-value="500000">50만</button>
+            <button type="button" class="pill" data-value="1000000">100만</button>
+            <button type="button" class="pill" data-value="2000000">200만</button>
+          </div>
+        </div>
+
+        <!-- 4. 취향 -->
+        <fieldset class="field span-2">
+          <legend class="label"><span class="step">4</span>여행 취향 <small>여러 개 선택 가능</small></legend>
+          <div class="chips">
+            <label class="chip"><input type="checkbox" name="prefs" value="맛집" checked /><span>🍜 맛집</span></label>
+            <label class="chip"><input type="checkbox" name="prefs" value="관광" /><span>📸 관광</span></label>
+            <label class="chip"><input type="checkbox" name="prefs" value="자연" checked /><span>🌿 자연</span></label>
+            <label class="chip"><input type="checkbox" name="prefs" value="휴식" /><span>🛀 휴식</span></label>
+            <label class="chip"><input type="checkbox" name="prefs" value="쇼핑" /><span>🛍️ 쇼핑</span></label>
+            <label class="chip"><input type="checkbox" name="prefs" value="카페" checked /><span>☕ 카페</span></label>
+            <label class="chip"><input type="checkbox" name="prefs" value="문화·역사" /><span>🏛️ 문화·역사</span></label>
+            <label class="chip"><input type="checkbox" name="prefs" value="액티비티" /><span>🏄 액티비티</span></label>
+          </div>
+        </fieldset>
+
+        <!-- 5. 이동수단 -->
+        <fieldset class="field span-2">
+          <legend class="label"><span class="step">5</span>이동수단</legend>
+          <div class="transport">
+            <label class="t-card">
+              <input type="radio" name="transport" value="car" checked />
+              <span class="t-emoji">🚗</span>
+              <span class="t-title">자동차 <em>추천</em></span>
+              <span class="t-desc">렌터카·자차로 자유롭게</span>
+            </label>
+            <label class="t-card">
+              <input type="radio" name="transport" value="car_walk" />
+              <span class="t-emoji">🚶</span>
+              <span class="t-title">자동차 + 도보</span>
+              <span class="t-desc">주차 후 걸어서 둘러보기</span>
+            </label>
+            <label class="t-card">
+              <input type="radio" name="transport" value="transit" />
+              <span class="t-emoji">🚌</span>
+              <span class="t-title">대중교통</span>
+              <span class="t-desc">버스·택시 위주</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- 6. 추가 요청 -->
+        <div class="field span-2">
+          <label class="label" for="request"><span class="step">6</span>추가 요청 <small>선택</small></label>
+          <textarea id="request" name="request" rows="3" placeholder="예: 부모님과 함께라 많이 걷지 않았으면 해요. 바다 보이는 숙소면 좋겠어요."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <p class="hint" id="form-hint">AI가 일정을 만드는 데 10~30초 정도 걸려요.</p>
+        <button id="submit-btn" type="submit" class="btn-primary">
+          <span class="btn-label">✨ 여행 일정 만들기</span>
+          <span class="spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+    </form>
+
+    <!-- ───────────── 장소 검색 (NAVER 지역 검색) ───────────── -->
+    <section class="card search-card" aria-labelledby="search-title">
+      <header class="panel-head">
+        <h2 id="search-title">🔍 장소 검색</h2>
+        <span class="panel-sub">NAVER 지역 검색 · 최대 5곳</span>
+      </header>
+      <form id="search-form" class="search-bar">
+        <span class="search-region" id="search-region" title="위 '여행 지역'과 연동돼요">강릉</span>
+        <input id="search-keyword" name="keyword" placeholder="키워드 (예: 순두부, 오션뷰 카페)" autocomplete="off" />
+        <select id="search-sort" name="sort" aria-label="정렬">
+          <option value="comment">리뷰 많은 순</option>
+          <option value="random">정확도 순</option>
+        </select>
+        <button type="submit" class="btn-search">검색</button>
+      </form>
+      <div class="quick search-quick" id="search-quick">
+        <button type="button" class="pill" data-keyword="관광지">📸 관광지</button>
+        <button type="button" class="pill" data-keyword="맛집">🍜 음식점</button>
+        <button type="button" class="pill" data-keyword="카페">☕ 카페</button>
+        <button type="button" class="pill" data-keyword="자연 명소">🌿 자연</button>
+        <button type="button" class="pill" data-keyword="숙소">🛏️ 숙소</button>
+        <button type="button" class="pill" data-keyword="시장">🛍️ 시장</button>
+      </div>
+      <div id="search-status" class="search-status" aria-live="polite"></div>
+      <ul id="search-results" class="place-list"></ul>
+      <p class="search-note">장소명·주소·카테고리·좌표는 NAVER 검색 결과 그대로이며, 영업시간·평점·가격은 제공되지 않아 표시하지 않아요.</p>
+    </section>
+
+    <!-- ───────────── 결과 ───────────── -->
+    <section id="results" class="results" aria-live="polite">
+      <div class="alert" id="alert" role="alert" hidden>
+        <span class="alert-icon">⚠️</span>
+        <div class="alert-body">
+          <b id="alert-title">일정을 만들지 못했어요</b>
+          <p id="alert-msg"></p>
+        </div>
+        <button type="button" class="alert-retry" id="alert-retry">다시 시도</button>
+      </div>
+      <div class="summary card" id="summary"></div>
+
+      <div class="day-tabs" id="day-tabs" role="tablist"></div>
+
+      <div class="result-grid">
+        <!-- 날짜별 일정 -->
+        <article class="card panel">
+          <header class="panel-head">
+            <h2>📅 날짜별 일정</h2>
+            <span class="panel-sub" id="day-label"></span>
+          </header>
+          <ol class="timeline" id="timeline"></ol>
+        </article>
+
+        <!-- 지도 -->
+        <article class="card panel">
+          <header class="panel-head">
+            <h2>🗺️ 지도</h2>
+            <span class="panel-sub" id="map-sub">샘플 지도 · Level 3에서 NAVER 지도로 교체</span>
+          </header>
+          <div class="map-box">
+            <div class="naver-map" id="naver-map" hidden></div>
+            <div class="svg-map" id="svg-map"></div>
+          </div>
+          <p class="map-note" id="map-note" hidden></p>
+          <div class="route-stats" id="route-stats"></div>
+        </article>
+
+        <!-- 예산 -->
+        <article class="card panel">
+          <header class="panel-head">
+            <h2>💰 예산</h2>
+            <span class="panel-sub" id="budget-sub"></span>
+          </header>
+          <div id="budget-view"></div>
+        </article>
+
+        <!-- Agent 실행 기록 -->
+        <article class="card panel">
+          <header class="panel-head">
+            <h2>🤖 Agent 실행 기록</h2>
+            <span class="panel-sub" id="log-sub"></span>
+          </header>
+          <div class="tool-chips" id="tool-chips" role="group" aria-label="도구별 필터"></div>
+          <ol class="agent-log" id="agent-log"></ol>
+        </article>
+
+        <!-- 출처 -->
+        <article class="card panel span-all">
+          <header class="panel-head">
+            <h2>📚 출처</h2>
+            <span class="panel-sub">일정에 쓰인 데이터가 어디서 왔는지</span>
+          </header>
+          <div id="sources-view"></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="access-dialog" id="access-dialog">
+    <form method="dialog">
+      <h2>🔒 접근 코드</h2>
+      <p id="access-msg">이 서비스는 접근 코드가 있어야 사용할 수 있어요.</p>
+      <input id="access-input" type="password" autocomplete="off" maxlength="100" placeholder="운영자에게 받은 코드" />
+      <div class="dialog-actions">
+        <button type="submit" value="cancel" class="btn-ghost" formnovalidate>취소</button>
+        <button type="submit" value="ok" class="btn-search">확인</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer class="footer">OpenAI Responses API · NAVER 지역 검색 · NAVER Maps 로 만들어질 예정이에요</footer>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
